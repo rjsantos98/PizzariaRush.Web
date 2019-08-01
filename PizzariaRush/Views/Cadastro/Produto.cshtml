@@ -1,0 +1,248 @@
+﻿@{
+    ViewBag.Title = "Produtos";
+}
+
+<h3>Produtos</h3>
+<hr>
+<div id="cabecalho">
+    <a id="btn_incluir" class="btn btn-success" role="button">
+        <i class=" glyphicon glyphicon-plus"></i> Incluir
+    </a>
+</div>
+<br>
+<div>
+    <table id="grid_produto" class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Categoria</th>
+                <th>Nome</th>
+                <th>Valor</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var produto in ViewBag.Produto)
+            {
+                <tr data-id="@produto.Id">
+                    <td>@produto.Id</td>
+                    <td>@produto.Categoria.Nome</td>
+                    <td>@produto.Nome</td>
+                    <td>@produto.Valor.ToString("C")</td>
+                    <td>
+                        <a class="btn btn-primary btn-alterar" role="button"><i class="glyphicon glyphicon-pencil"></i> Alterar</a>
+                        <a class="btn btn-danger btn-excluir" role="button"><i class="glyphicon glyphicon-trash"></i> Excluir</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div id="modal_cadastro" class="form-horizontal" style="display:none" role="dialog">
+    <fieldset>
+        <div class="row">
+            <div class="form-group">
+                @Html.Label("txt_codigo", "Código", new { @class = "col-md-3 control-label" })
+                <div class="col-md-2">
+                    @Html.TextBox("txt_codigo", null, new { @class = "form-control", disabled = "true" })
+                </div>
+                <br><br>
+                @Html.Label("cmb_categoria", "Categoria", new { @class = "col-md-3 control-label" })
+                <div class="col-md-3">
+                    <select id="cmb_categoria" class="form-control">
+                        @foreach (var categoria in ViewBag.Categoria)
+                        {
+                            <option value="@categoria.Id">@categoria.Nome</option>
+                        }
+                    </select>
+                </div>
+                <br><br>
+                @Html.Label("txt_nome", "Nome", new { @class = "col-md-3 control-label" })
+                <div class="col-md-6">
+                    @Html.TextBox("txt_nome", null, new { @class = "form-control" })
+                </div>
+                <br><br>
+                @Html.Label("txt_valor", "Valor", new { @class = "col-md-3 control-label" })
+                <div class="col-md-3">
+                    @Html.TextBox("txt_valor", null, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <div class="modal-footer">
+                        <a id="btn_sair" class="btn btn-default" role="button" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Sair</a>
+                        <a id="btn_confirmar" class="btn btn-primary" role="button"><i class="glyphicon glyphicon-ok"></i> Salvar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</div>
+
+@section Scripts{
+    <script>
+        function abrir_form(dados) {
+            if (dados.Id > 0)
+                $('#txt_codigo').val(dados.Id);
+            else
+                $('#txt_codigo').val('');
+
+            $('#cmb_categoria').val(dados.Categoria.Id);
+            $('#cmb_categoria option:selected').text(dados.Categoria.Nome);
+
+            $('#txt_nome').val(dados.Nome);
+
+            $('#txt_valor').val(dados.Valor).toString().replace('.', ',');
+
+            var modal_cadastro = $('#modal_cadastro');
+
+            bootbox.dialog({
+                title: '@ViewBag.Title',
+                message: modal_cadastro
+            })
+            .on('shown.bs.modal', function () {
+                modal_cadastro.show(0, function () {
+                    $('#txt_nome').focus();
+                });
+            })
+            .on('hidden.bs.modal', function () {
+                modal_cadastro.hide().appendTo('body');
+            });
+        }
+
+        function criar_linha_grid(dados) {
+            var preco = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(dados.Valor);
+            var ret = '<tr data-id=' + dados.Id + '>' +
+                '<td>' + dados.Id + '</td>' +
+                '<td>' + dados.Categoria.Nome + '</td>' +
+                '<td>' + dados.Nome + '</td>' +
+                '<td>' + preco + '</td>' +
+                '<td>' +
+                '<a class="btn btn-primary btn-alterar" role="button"><i class="glyphicon glyphicon-pencil"></i>Alterar</a>' +
+                '<a class="btn btn-danger btn-excluir" role="button"><i class="glyphicon glyphicon-trash"></i>Excluir</a>' +
+                '</td>' +
+                '</tr>';
+
+            return ret;
+        }
+
+        $(document).on('click', '#btn_incluir', function () {
+            if ($('#txt_codigoPedido').val() == '') {
+                var btn = $(this),
+                    id = btn.closest('tr').attr('data-id'),
+                    url = '@Url.Action("SalvarPedido", "Operacao")',
+                    param = {
+                        Id: 0
+                        , Cliente: {
+                            Id: $('#cmb_cliente option:selected').val()
+                            , Nome: $('#cmb_cliente option:selected').text()
+                            , Telefone: null
+                            , Endereco: null
+                        }
+                        , ItensPedido: null
+                        , ValorTotal: null
+                    };
+
+                $.post(url, param, function (response) {
+                    if (response) {
+                        $('#txt_codigoPedido').val(response.Id)
+                    }
+                });
+        }
+
+        $(document).on('click', '#btn_incluir', function () {
+            abrir_form({ Id: null, Nome: '', Categoria: { Id: null, Nome: null }, Valor: null });
+        })
+
+        .on('click', '.btn-alterar', function () {
+            var btn = $(this),
+                id = btn.closest('tr').attr('data-id'),
+                url = '@Url.Action("ObterProduto", "Cadastro")',
+                param = { 'id': id };
+
+            $.post(url, param, function (response) {
+                if (response) {
+                    abrir_form(response);
+                }
+            });
+        })
+
+        .on('click', '.btn-excluir', function () {
+            var btn = $(this),
+                tr = btn.closest('tr'),
+                id = tr.attr('data-id'),
+                url = '@Url.Action("ExcluirProduto", "Cadastro")',
+                param = { 'id': id };
+
+            bootbox.confirm({
+                message: "Confirma a exclusão do Produto?",
+                buttons: {
+                    confirm: {
+                        label: 'Sim',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'Não',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        $.post(url, param, function (response) {
+                            if (response) {
+                                tr.remove();
+                            }
+                        });
+                    }
+                }
+            });
+        })
+
+        .on('change', '#cmb_produto', function () {
+            var url = '@Url.Action("ObterProduto", "Produto")',
+                param = { Id : $('#cmb_produto option:selected').val() };
+
+            $.post(url, param, function (response) {
+                if (response) {
+                    $('#txt_valor').val(response.Valor);
+                }
+            });
+        })
+
+        .on('click', '#btn_confirmar', function () {
+            var btn = $(this),
+                url = '@Url.Action("SalvarProduto", "Cadastro")',
+                param = {
+                    Id: $('#txt_codigo').val(),
+                    Categoria: {
+                        Id: $('#cmb_categoria').val(),
+                        Nome: $('#cmb_categoria option:selected').text()
+                    },
+                    Nome: $('#txt_nome').val(),
+                    Valor: $('#txt_valor').val()
+                };
+
+            $.post(url, param, function (response) {
+                if (param.Id == 0) {
+                    var table = $('#grid_produto').find('tbody'),
+                        linha = criar_linha_grid(response);
+
+                    table.append(linha);
+                }
+                else {
+                    var linha = $('#grid_produto').find('tr[data-id=' + param.Id + ']').find('td');
+                    linha
+                        .eq(0).html(param.Id).end()
+                        .eq(1).html(param.Categoria.Nome).end()
+                        .eq(2).html(param.Nome).end()
+                        .eq(3).html("R$ "+param.Valor);
+                }
+
+                $('#modal_cadastro').parents('.bootbox').modal('hide');
+            })
+        })
+    </script>
+}

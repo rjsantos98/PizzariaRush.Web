@@ -4,6 +4,20 @@
 }
 
 /* Set padding to keep content from hitting the edges */
+
+#classtext {
+    padding-bottom: 50px;
+}
+
+.text img {
+    float: left;
+    max-width: 186px;
+}
+
+.text p {
+    text-align: justify;
+}
+
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
@@ -21,4 +35,12 @@ input,
 select,
 textarea {
     max-width: 280px;
+}
+
+#imgtext {
+    padding-right: 2px;
+}
+
+.invisivel {
+    display: none;
 }

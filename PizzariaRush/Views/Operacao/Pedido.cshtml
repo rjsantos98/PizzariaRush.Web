@@ -1,0 +1,796 @@
+﻿@model List<PizzariaRush.Controllers.CadastroController>
+@{
+    ViewBag.Title = "Pedidos";
+}
+
+<h3 id="titulo_pedido">Pedidos</h3>
+<div id="cabecalho">
+    <a id="btn_incluir" class="btn btn-success" role="button">
+        <i class="glyphicon glyphicon-plus"></i> <b>Novo</b>
+    </a>
+    <a id="btn_pedidos" class="btn btn-success" style="display:none" role="button">
+        <i class="glyphicon glyphicon-arrow-left"></i> <b>Pedidos</b>
+    </a>
+</div>
+<br />
+
+<div id="pedidos_geral">
+    <div>
+        <table id="grid_pedidos" class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente - Telefone</th>
+                    <th>Valor Total</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pedido in ViewBag.Pedidos)
+                {
+                    <tr data-id="@pedido.Id">
+                        <td>@pedido.Id</td>
+                        <td>@pedido.Cliente.Nome - @pedido.Cliente.Telefone</td>
+                        <td>@pedido.ValorTotal.ToString("C")</td>
+                        <td>
+                            <a class="btn btn-primary btn-alterar" role="button"><i class="glyphicon glyphicon-pencil"></i>Alterar</a>
+                            <a class="btn btn-danger btn-excluir" role="button"><i class="glyphicon glyphicon-trash"></i>Excluir</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div id="novo_pedido" style="display:none">
+    <fieldset>
+        <legend>Dados</legend>
+        <div class="row">
+            <div class="form-group">
+                @Html.Label("txt_codigo_pedido", "Código", new { @class = "col-md-3 control-label" })
+                <a id="btn_incluir_cliente" class="btn btn-default" role="button">
+                    <i class="glyphicon glyphicon-user"></i>  <b>&nbsp; Novo Cliente</b>
+                </a>
+                <div class="col-md-2">
+                    @Html.TextBox("txt_codigo_pedido", null, new { @class = "form-control", disabled = "true" })
+                </div>
+                <div class="col-md-5"></div>
+                <br /><br />
+                @Html.Label("txt_telefone_cliente", "Telefone", new { @class = "col-md-3 control-label" })
+                <a id="btn_pesquisar_usuario" class="btn btn-info" role="button">
+                    <i class="glyphicon glyphicon-search"></i>
+                </a>
+                <div class="col-md-8">
+                    @Html.TextBox("txt_telefone_cliente", null, new { @class = "form-control" })
+                </div>
+                <br /><br />
+                <div id="dados_cliente">
+                    <fieldset>
+                        <div class="form-group">
+                            @Html.TextBox("txt_id_cliente", "ID", new { @class = "hidden" })
+                            @Html.Label("txt_nome_cliente", "Cliente", new { @class = "col-md-3 control-label" })
+                            <div class="col-md-3">
+                                @Html.TextBox("txt_nome_cliente", null, new { @class = "form-control", disabled = "true" })
+                            </div>
+                            <br>
+                            @Html.Label("txt_endereco_cliente", "Endereço", new { @class = "col-md-3 control-label" })
+                            <div class="col-md-3">
+                                @Html.TextBox("txt_endereco_cliente", null, new { @class = "form-control", disabled = "true" })
+                            </div>
+                            <br />
+                            @Html.Label("txt_numero_cliente", "Numero", new { @class = "col-md-3 control-label" })
+                            <div class="col-md-3">
+                                @Html.TextBox("txt_numero_cliente", null, new { @class = "form-control", disabled = "true" })
+                            </div>
+                            <br />
+                            @Html.Label("txt_complemento_cliente", "Complemento", new { @class = "col-md-3 control-label" })
+                            <div class="col-md-3">
+                                @Html.TextBox("txt_complemento_cliente", null, new { @class = "form-control", disabled = "true" })
+                            </div>
+                            <br />
+                            @Html.Label("txt_bairro_cliente", "Bairro", new { @class = "col-md-3 control-label" })
+                            <div class="col-md-3">
+                                @Html.TextBox("txt_bairro_cliente", null, new { @class = "form-control", disabled = true })
+                            </div>
+                            <br />
+                            @Html.Label("txt_cidade_cliente", "Cidade", new { @class = "col-md-3 control-label" })
+                            <div class="col-md-3">
+                                @Html.TextBox("txt_cidade_cliente", null, new { @class = "form-control", disabled = true })
+                            </div>
+                            <br /><br />
+                            <br /><br />
+                            <div class="col-md-11">
+                                <a class="btn btn-sm pull-right btn-alterar-cliente" role="button"><i class="glyphicon glyphicon-pencil"></i> Alterar</a>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="container">
+                    <br /><br>
+                    <fieldset>
+                        <legend>Produtos</legend>
+                        <div id="tabela_produtos">
+                            <table id="produtosPedidos" class="table table-bordered table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Produto</th>
+                                        <th>Valor</th>
+                                        <th>Quantidade</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div>
+                            <a id="btn_incluir_item" class="btn btn-success" role="button">
+                                <i class="glyphicon glyphicon-plus"></i> Produto
+                            </a>
+                        </div>
+                    </fieldset>
+                </div>
+                <br /><br />
+                @Html.Label("txt_valor", "Valor Total", new { @class = "col-md-3 control-label" })
+                <div class="col-md-9">
+                    @Html.TextBox("txt_valor", "R$ 0,00", new { @class = "form-control", disabled = "disabled", style = "width:100px;float:left;" })
+                </div>
+                <br><br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <div class="modal-footer">
+                        <a id="btn_confirmar" class="btn btn-primary" role="button"><i class="glyphicon glyphicon-ok"></i> Salvar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</div>
+
+<div id="modal_produtos" class="form-horizontal" role="dialog" style="display:none">
+    <table id="incluir_produtos" class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Produto</th>
+                <th>Valor</th>
+                <th>Quantidade</th>
+                <th>Total</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var produto in ViewBag.Produtos)
+            {
+                <tr data-id="@produto.Id">
+                    <td class="prod-id">@produto.Id</td>
+                    <td class="prod-nome">@produto.Nome</td>
+                    <td class="prod-preco">@produto.Valor.ToString("C")</td>
+                    <td class="td_quantidade">0</td>
+                    <td class="td_total">R$0,00</td>
+                    <td>
+                        <a class="btn btn-success btn-adicionar-prod" role="button"><i class="glyphicon glyphicon-plus"></i></a>
+                        <a class="btn btn-danger btn-remover-prod" role="button"><i class="glyphicon glyphicon-minus"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <div class="modal-footer">
+                    <a id="btn_sair_produtos" class="btn btn-default" role="button" data-dismiss="modal"><i class="glyphicon glyphincon-remove"></i>Cancelar</a>
+                    <a id="btn_finaliza_produtos" class="btn btn-primary" role="button"><i class="glyphicon glyphicon-ok"></i> Confirmar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="modal_cliente" class="form-horizontal invisivel" role="dialog">
+    <fieldset>
+        <div class="row">
+            <div class="form-group">
+                @Html.Label("txt_codigo", "Código", new { @class = "col-md-3 control-label" })
+                <div class="col-md-2">
+                    @Html.TextBox("txt_codigo", null, new { @class = "form-control", disabled = "true" })
+                </div>
+                <br><br>
+                @Html.Label("txt_nome", "Nome do Cliente", new { @class = "col-md-3 control-label" })
+                <div class="col-md-9">
+                    @Html.TextBox("txt_nome", null, new { @class = "form-control" })
+                </div>
+                <br><br>
+                @Html.Label("txt_telefone", "Telefone", new { @class = "col-md-3 control-label" })
+                <div class="col-md-9">
+                    @Html.TextBox("txt_telefone", null, new { @class = "form-control" })
+                </div>
+                <br><br>
+                @Html.Label("txt_endereco", "Endereço", new { @class = "col-md-3 control-label" })
+                <div class="col-md-9">
+                    @Html.TextBox("txt_endereco", null, new { @class = "form-control" })
+                </div>
+                <br><br>
+                @Html.Label("txt_numero", "Numero", new { @class = "col-md-3 control-label" })
+                <div class="col-md-2">
+                    @Html.TextBox("txt_numero", null, new { @class = "form-control" })
+                </div>
+                <br><br>
+                @Html.Label("txt_complemento", "Complemento", new { @class = "col-md-3 control-label" })
+                <div class="col-md-3">
+                    @Html.TextBox("txt_complemento", null, new { @class = "form-control" })
+                </div>
+                <br><br>
+                @Html.Label("txt_bairro", "Bairro", new { @class = "col-md-3 control-label" })
+                <div class="col-md-3">
+                    @Html.TextBox("txt_bairro", null, new { @class = "form-control" })
+                </div>
+                <br><br>
+                @Html.Label("txt_cidade", "Cidade", new { @class = "col-md-3 control-label" })
+                <div class="col-md-3">
+                    @Html.TextBox("txt_cidade", null, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <div class="modal-footer">
+                        <a id="btn_sair_cliente" class="btn btn-default" role="button" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Sair</a>
+                        <a id="btn_confirmar_cliente" class="btn btn-primary" role="button"><i class="glyphicon glyphicon-ok"></i> Salvar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</div>
+
+@section Scripts{
+    <script>
+        //Grid Produtos Pedidos
+        var clienteverificado = false;
+        function incluir_item_pedido(item, quantidade, total) {
+            var precototal = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total);
+            var ret = '<tr data-id ="' + item.Id + '">'
+                + '<td class="prod-nome">' + item.Id + '</td>'
+                + '<td class="prod-nome">' + item.Nome + '</td>'
+                + '<td class="prod-preco">' + Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.Valor) + '</td>'
+                + '<td class="td_quantidade">' + quantidade + '</td>'
+                + '<td class="td_total">' + precototal + '</td>'
+                + '</tr>';
+            return ret;
+        }
+
+        //Form Produtos Pedidos
+        $(document).on('click', '.btn-adicionar-prod', function () {
+            var naoachei = true;
+            var btn = $(this),
+                tr = btn.closest('tr'),
+                tr_quantidade = tr.find('.td_quantidade').text(),
+                tr_preco = tr.find('.prod-preco').text(),
+                tr_total = tr.find('.td_total').text();
+            var quantidade = parseInt(tr_quantidade);
+            var precoprod = parseFloat(tr_preco.replace("R$", '').replace(',', '.'));
+
+            if (tr_total != "R$0,00") {
+                var precototal = parseFloat(tr_total.replace("RS", '').replace(',', '.'));
+            }
+
+            if (quantidade >= 0) {
+                quantidade += 1;
+                precototal = quantidade * precoprod;
+                var btn = $(this),
+                    corpotable = $('#produtosPedidos').find('tbody'),
+                    id = btn.closest('tr').attr('data-id'),
+                    url = '@Url.Action("ObterProduto", "Cadastro")',
+                    param = { 'id': id };
+
+            $.post(url, param, function (response) {
+                if (response) {
+                    var naotemtabela = true;
+                    $('#tabela_produtos').find('tbody tr').each(function () {
+                        tr_produtos = $(this);
+                        naotemtabela = false;
+                        var idlinha = $(this).attr('data-id');
+                        if (idlinha == response.Id) {
+                            naoachei = false;
+                            tr_produtos.find('.td_quantidade').text(quantidade);
+                            tr_produtos.find('.td_total').text((Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(precototal)));
+                            tr.find('.td_quantidade').text(quantidade);
+                            tr.find('.td_total').text((Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(precototal)));
+                            return false;
+                            }
+
+                        else {
+                                naoachei = true;
+                        }
+                    });
+
+                    if (naotemtabela || naoachei) {
+                        $('#tabela_produtos tbody').append(incluir_item_pedido(response, quantidade, precototal));
+                        tr.find('.td_quantidade').text(quantidade);
+                        tr.find('.td_total').text((Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(precototal)));
+                    }
+                }
+            });
+        }
+
+        //Remover Linha Produto Pedido
+        }).on('click', '.btn-remover-prod', function () {
+            var naoachei = true;
+            var btn = $(this),
+                tr = btn.closest('tr'),
+                tr_quantidade = tr.find('.td_quantidade').text(),
+                tr_preco = tr.find('.prod-preco').text(),
+                tr_total = tr.find('.td_total').text();
+            var quantidade = parseInt(tr_quantidade);
+            var precoprod = parseFloat(tr_preco.replace("R$", '').replace(',', '.'));
+
+            if (tr_total != "R$0,00") {
+                var precototal = parseFloat(tr_total.replace("RS", '').replace(',', '.'));
+            }
+            if (quantidade > 0) {
+
+                quantidade -= 1;
+                precototal = quantidade * precoprod;
+                var btn = $(this),
+                    corpotable = $('#produtosPedidos').find('tbody'),
+                    id = btn.closest('tr').attr('data-id'),
+                    url = '@Url.Action("ObterProduto", "Cadastro")',
+                    param = { 'id': id };
+
+                $.post(url, param, function (response) {
+                    if (response) {
+                        var naotemtabela = true;
+                        $('#tabela_produtos').find('tbody tr').each(function () {
+                            tr_produtos = $(this);
+                            naotemtabela = false;
+                            var idlinha = $(this).attr('data-id');
+                            if (idlinha == response.Id) {
+                                naoachei = false;
+                                tr_produtos.find('.td_quantidade').text(quantidade);
+                                tr_produtos.find('.td_total').text((Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(precototal)));
+                                tr.find('.td_quantidade').text(quantidade);
+                                tr.find('.td_total').text((Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(precototal)));
+                                if (quantidade == 0) {
+                                    tr_produtos.remove();
+                                    return false;
+                                }
+                                return false;
+                            }
+                            else {
+                                naoachei = true;
+                                bootbox.message("não achei");
+                            }
+                        });
+                        if (naotemtabela || naoachei) {
+                            $('#tabela_produtos tbody').append(incluir_item_pedido(response, quantidade, precototal));
+                            tr.find('.td_quantidade').text(quantidade);
+                            tr.find('.td_total').text((Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(precototal)));
+                        }
+                    }
+                });
+            }
+
+        }).on('click', '#btn_finaliza_produtos', function () {
+            $('#produtosPedidos').show();
+            $('#modal_produtos').parents('.bootbox').modal('hide');
+
+            }).on('click', '#btn_sair_produtos', function () {
+            $('#tabela_produtos').html('');
+            $('#produtosPedidos').hide();
+            $('#tabela_produtos').html(iniciar_tabela_produtopedido());
+            resetar_tabela();
+        });
+
+        function resetar_tabela() {
+            $('#incluir_produtos tr').each(function () {
+                $(this).find('.td_quantidade').text('0');
+                $(this).find('.td_total').text('R$0,00');
+            });
+        }
+
+        function iniciar_tabela_produtopedido() {
+            var ret = "<table id='produtosPedidos' class='table table-bordered table-striped table-hover'>"
+                    + " <thead>"
+                    + "     <tr>"
+                    + "         <th>Id</th>"
+                    + "         <th>Produto</th>"
+                    + "         <th>Valor</th>"
+                    + "         <th>Quantidade</th>"
+                    + "         <th>Total</th>"
+                    + "     </tr>"
+                    + " </thead>"
+                    + " <tbody>"
+                    + " </tbody>"
+                + "</table> "
+            return ret;
+        }
+
+        function abrir_pedido(dados) {
+            if (dados.Id > 0)
+                $('#txt_codigo_pedido').val(dados.Id);
+            else
+                $('#txt_codigo_pedido').val('');
+
+            //cliente, valor total, produtos pedidos
+            var preco = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(dados.ValorTotal);
+            $('#txt_telefone_cliente').val(dados.Cliente.Telefone);
+            $('#txt_valor').val(preco);
+            $('#txt_nome_cliente').val(dados.Cliente.Nome);
+            $('#txt_endereco_cliente').val(dados.Cliente.Endereco);
+            $('#txt_numero_cliente').val(dados.Cliente.Numero);
+            $('#txt_complemento_cliente').val(dados.Cliente.Complemento);
+            $('#txt_bairro_cliente').val(dados.Cliente.Bairro);
+            $('#txt_cidade_cliente').val(dados.Cliente.Cidade);
+            popular_itens_alterar(dados);
+            InserirAlterarPedido();
+        }
+        function abrir_itens_pedido() {
+            var modal_produtos = $('#modal_produtos');
+            var dialog =
+                bootbox.dialog({
+                    title: 'Adicionar produtos',
+                    message: modal_produtos
+                }).on('shown.bs.modal', function () {
+                    modal_produtos.show(0);
+                }).on('hidden.bs.modal', function () {
+                    modal_produtos.hide().appendTo('body');
+                    $('#txt_valor').val(function (e) {
+                        var vtotal = parseFloat(0.00);
+                        $('#tabela_produtos').find('tbody tr').each(function () {
+                            var valor = parseFloat($(this).find('.td_total').text().replace('R$', '').replace(',', '.'));
+                            vtotal += valor;
+                        })
+                        return Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(vtotal);;
+                    })
+                })
+        }
+
+        //Grid Criar Pedido
+        function criar_linha_grid(dados) {
+            var valortotal = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(dados.ValorTotal);
+            var ret = '<tr data-id ="' + dados.Id + '">'
+                + '<td>' + dados.Id + '</td>'
+                + '<td>' + dados.Cliente.Nome + " - " + dados.Cliente.Telefone + '</td>'
+                + '<td>' + valortotal + '</td>'
+                + '<td>'
+                + '<a class="btn btn-primary btn-alterar" role="button" style="margin-right:4px"><i class="glyphicon glyphicon-pencil"></i> Alterar</a>'
+                + '<a class="btn btn-danger btn-excluir" role="button"><i class="glyphicon glyphicon-trash"></i>Excluir</a>'
+                + '</td>'
+                + '</tr>';
+
+            return ret;
+        }
+        function InserirAlterarPedido() {
+            $('#novo_pedido').show();
+            $('#btn_pedidos').show();
+            $('#pedidos_geral').hide();
+            $('#btn_incluir').hide();
+
+
+        }
+        function popular_itens_alterar(pedido) {
+                        var ret;
+            var appendtable = $('#produtosPedidos').find('tbody');
+            pedido.listaProdutosPedidos.forEach(function (prod) {
+                ret = "<tr data-id='" + prod.Produto.Id + "'>"
+                    + "<td class='prod-id'>" + prod.Produto.Id + "</td>"
+                    + "<td class='prod-nome'>" + prod.Produto.Nome + "</td>"
+                    + "<td class='prod-preco'>" + Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(prod.Produto.Valor) + "</td>"
+                    + "<td class='td_quantidade'>" + prod.Quantidade + "</td>"
+                    + "<td class='td_total'>" + Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(prod.Quantidade) * parseFloat(prod.Produto.Valor)) + "</td>"
+                    + "</tr>";
+                appendtable.append(ret);
+                $('#incluir_produtos').find('tbody tr').each(function () {
+                    var tr_table = $(this);
+                        id = $(this).attr('data-id');
+                    if (id == prod.Produto.Id) {
+                        tr_table.find('.td_quantidade').text(prod.Quantidade);
+                        tr_table.find('.td_total').text(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(prod.Quantidade) * parseFloat(prod.Produto.Valor)));
+                    }
+                });
+            });
+        }
+
+        //
+        $(document).on('click', '#btn_incluir', function () {
+            InserirAlterarPedido();
+            $('#titulo_pedido').text('Cadastrar Pedido');
+            $('#tabela_produtos').html('');
+            $('#txt_telefone_cliente').val('');
+            $('#txt_valor').val('R$ 0,00');
+            $('#txt_codigo_pedido').val('');
+            $('#tabela_produtos').html(iniciar_tabela_produtopedido());
+
+            //dados_cliente
+            $('#dados_cliente').hide();
+            $('#dados_cliente').children().hide();
+            $('#dados_cliente input').val('');
+
+            //Botão para voltar á tabela pedidos
+        }).on('click', '#btn_pedidos', function () {
+            $('#titulo_pedido').text('Pedidos');
+            $('#novo_pedido').hide();
+            $('#btn_pedidos').hide();
+            $('#pedidos_geral').show();
+            $('#btn_incluir').show();
+            $('#dados_cliente input').val('');
+            $('#novo_pedido').hide();
+            $('#tabela_produtos').html('');
+            $('#produtosPedidos').hide();
+            $('#tabela_produtos').html(iniciar_tabela_produtopedido());
+            resetar_tabela();
+
+            }).on('click', '.btn-alterar', function () {
+                InserirAlterarPedido();
+            var btn = $(this),
+                id = btn.closest('tr').attr('data-id'),
+                url = '@Url.Action("ObterPedido","Operacao")',
+                param = { 'id': id };
+            $.post(url, param, function (response) {
+                if (response) {
+                    abrir_pedido(response);
+                    var telefone = $('#txt_telefone_cliente').val(),
+                        url = '@Url.Action("ChecarCliente","Cadastro")',
+                        param = { 'Telefone': telefone };
+                    $.post(url, param, function (response) {
+                        if (response) {
+                            if (response.Telefone.includes(telefone)) {
+                                clienteverificado = true;
+                                $('#txt_id_cliente').val(response.Id);
+                            }
+                        }
+                        else
+                            bootbox.alert({
+                                size: "small",
+                                title: "Aviso",
+                                message: "Por favor clique no botão para realizar a verificação do cliente!"
+                            });
+                    });
+                }
+            });
+
+        // pesquisar usuario
+        }).on('click', '#btn_pesquisar_usuario', function () {
+            if (parseInt($('#txt_telefone_cliente').val().length) >= 8) {
+                var telefone = $('#txt_telefone_cliente').val(),
+                    url = '@Url.Action("ChecarCliente","Cadastro")',
+                    param = { 'Telefone': telefone };
+                $.post(url, param, function (response) {
+                    if (response.Telefone.includes(telefone)) {
+                        $('#dados_cliente').show();
+                        $('#dados_cliente').children().show();
+                        clienteverificado = true;
+                        $('#dados_cliente').show();
+                        $('#txt_id_cliente').val(response.Id)
+                        $('#txt_nome_cliente').val(response.Nome);
+                        $('#txt_telefone_cliente').val(response.Telefone);
+                        $('#txt_endereco_cliente').val(response.Endereco);
+                        $('#txt_numero_cliente').val(response.Numero);
+                        $('#txt_complemento_cliente').val(response.Complemento);
+                        $('#txt_bairro_cliente').val(response.Bairro);
+                        $('#txt_cidade_cliente').val(response.Cidade);
+                    }
+                    else if (response.Telefone == null){
+                        clienteverificado = false;
+                        bootbox.alert("Cliente não cadastrado");
+                        $('#txt_id_cliente').val('');
+                        $('#txt_nome_cliente').val('');
+                        $('#txt_endereco_cliente').val('');
+                        $('#txt_numero_cliente').val('');
+                        $('#txt_complemento_cliente').val('');
+                        $('#txt_bairro_cliente').val('');
+                        $('#txt_cidade_cliente').val('');
+                        $('#dados_cliente').hide();
+                        $('#dados_cliente').children().hide();
+                    }
+                })
+            }
+            else {
+                bootbox.alert("O telefone deve conter no mínimo 8 (oito) dígitos!");
+            };
+
+        // salvar pedido
+        }).on('click', '#btn_confirmar', function () {
+            if (clienteverificado) {
+                var idpedido = $('#txt_codigo_pedido').val();
+                var url = '@Url.Action("SalvarPedido", "Operacao")';
+                var clienteDados = {
+                    Id: parseInt($('#txt_id_cliente').val()),
+                    Nome: $('#txt_nome_cliente').val(),
+                    Telefone: $('#txt_telefone_cliente').val(),
+                    Endereco: $('#txt_endereco_cliente').val(),
+                    Numero: $('#txt_numero_cliente').val(),
+                    Complemento: $('#txt_complemento_cliente').val(),
+                    Bairro: $('#txt_bairro_cliente').val(),
+                    Cidade: $('#txt_cidade_cliente').val()
+                };
+                var pedido = {
+                    Id: parseInt($('#txt_codigo_pedido').val()),
+                    Cliente: clienteDados,
+                    ValorTotal: $('#txt_valor').val().replace('R$', ''),
+                    listaProdutosPedidos: []
+                };
+                if ($('#tabela_produtos tr').length <= 1) {
+                    bootbox.alert({ title: "Aviso", message: "Selecione os produtos!" });
+                    return false;
+                }
+                else {
+                    $('#tabela_produtos tr[data-id]').each(function () {
+                        pedido.listaProdutosPedidos.push({
+                            Pedido: idpedido,
+                            Produto: {
+                                Id: $(this).attr('data-id'),
+                                Categoria: {
+                                    Id: null,
+                                    Nome: null
+                                },
+                                Nome: $(this).find('.prod-nome').text(),
+                                Valor: $(this).find('.prod-preco').text().replace('R$', '')
+                            },
+                            Quantidade: $(this).find('.td_quantidade').text(),
+                            ValorPedido: $(this).find('.td_total').text().replace('R$', '')
+                        });
+                    });
+                }
+                $.post(url, pedido, function (responseSAVE) {
+                    if (!parseInt(pedido.Id)) {
+                        var table = $('#grid_pedidos').find('tbody'),
+                            linha = criar_linha_grid(responseSAVE);
+                        table.append(linha);
+                    }
+                    else {
+                        var linha = $('#grid_pedidos').find('tr[data-id="' + pedido.Id + '"]').find('td');
+                        var preco = parseFloat(pedido.ValorTotal.replace(',', '.'));
+                        linha
+                            .eq(0).html(pedido.Id).end()
+                            .eq(1).html(pedido.Cliente.Nome + " - " + pedido.Cliente.Telefone).end()
+                            .eq(2).html(Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(preco));
+                    }
+                    $('#novo_pedido').hide();
+                    $('#btn_pedidos').hide();
+                    $('#pedidos_geral').show();
+                    $('#btn_incluir').show();
+                    $('#tabela_produtos').html('');
+                    $('#produtosPedidos').hide();
+                    $('#tabela_produtos').html(iniciar_tabela_produtopedido());
+                    $('#dados_cliente input').val('');
+                    resetar_tabela();
+                    bootbox.alert({
+                        size: "small",
+                        title: "Sucesso",
+                        message: "Pedido registrado com sucesso!"
+                    });
+                });
+            }
+            else {
+                bootbox.alert({
+                    size: "small",
+                    title: "Aviso",
+                    message: "Antes de confirmar o pedido, realize a verificação do cliente"
+                });
+            }
+        }).on('click', '.btn-excluir', function () {
+        var btn = $(this),
+            tr = btn.closest('tr'),
+            id = tr.attr('data-id'),
+            url = '@Url.Action("ExcluirPedido","Operacao")',
+            param = { 'id': id };
+        bootbox.confirm({
+            message: "Deseja excluir o pedido?",
+            buttons: {
+                confirm: {
+                    label: 'Sim',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'Não',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    $.post(url, param, function (response) {
+                        if (response)
+                            tr.remove();
+                    });
+                }
+            }
+        });
+    });
+
+        $(document).on('click', '#btn_incluir_item', function () {
+            abrir_itens_pedido();
+        });
+
+        //Exibição do Form Modal Cadastro Cliente
+        function abrir_form(dados) {
+            if (dados.Id > 0)
+                $('#txt_codigo').val(dados.Id);
+            else
+                $('#txt_codigo').val('');
+
+            $('#txt_nome').val(dados.Nome);
+            $('#txt_telefone').val(dados.Telefone);
+            $('#txt_endereco').val(dados.Endereço);
+            $('#txt_numero').val(dados.Numero);
+            $('#txt_complemento').val(dados.Complemento);
+            $('#txt_bairro').val(dados.Bairro);
+            $('#txt_cidade').val(dados.Cidade);
+
+
+            var modal_cliente = $('#modal_cliente');
+
+            bootbox.dialog({
+                title: 'Cadastrar Cliente',
+                message: modal_cliente
+            })
+            .on('shown.bs.modal', function () {
+                modal_cliente.show(0, function () {
+                    $('#txt_nome').focus();
+                });
+            })
+            .on('hidden.bs.modal', function () {
+                modal_cliente.hide().appendTo('body');
+            });
+        }
+
+                //Evento click do botão incluir
+        $(document).on('click', '#btn_incluir_cliente', function () {
+            var ptelefone = $('#txt_telefone_cliente').val();
+            abrir_form({ Id: 0, Nome: '', Telefone: (ptelefone) , Endereço: '', Numero: '', Complemento: '', Bairro: '', Cidade: ''});
+        })
+
+            //Evento click do botão alterar
+            .on('click', '.btn-alterar-cliente', function () {
+            var btn = $(this),
+            telefone = $('#txt_telefone_cliente').val(),
+                    url = '@Url.Action("ChecarCliente","Cadastro")',
+                    param = { 'Telefone': telefone };
+            $.post(url, param, function (response) {
+                if (response) {
+                    abrir_form(response);
+                }
+            });
+        })
+
+        //Evento click do botão Salvar do form modal
+            .on('click', '#btn_confirmar_cliente', function () {
+                var btn = $(this),
+                url = '@Url.Action("SalvarCliente", "Cadastro")',
+                param = {
+                    Id: $('#txt_codigo').val(),
+                    Nome: $('#txt_nome').val(),
+                    Telefone: $('#txt_telefone_cliente').val(),
+                    Endereco: $('#txt_endereco').val(),
+                    Numero: $('#txt_numero').val(),
+                    Complemento: $('#txt_complemento').val(),
+                    Bairro: $('#txt_bairro').val(),
+                    Cidade: $('#txt_cidade').val()
+                }
+
+            $.post(url, param, function (response) {
+                    var linha = $('#grid_cadastro').find('tr[data-id=' + param.Id + ']').find('td');
+                    linha
+                        .eq(0).html(param.Id)
+                        .eq(1).html(param.Nome)
+                        .eq(2).html(param.Telefone)
+                        .eq(3).html(param.Endereco)
+                        .eq(4).html(param.Numero)
+                        .eq(5).html(param.Complemento)
+                        .eq(6).html(param.Bairro).end()
+                        .eq(7).html(param.Cidade);
+                $('#btn_pesquisar_usuario').click();
+                $('#modal_cliente').parents('.bootbox').modal('hide');
+            })
+        })
+    </script>
+}

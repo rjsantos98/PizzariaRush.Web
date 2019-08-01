@@ -1,0 +1,185 @@
+﻿@{
+    ViewBag.Title = "Categoria de Produtos";
+}
+
+<h3>Categoria de Produtos</h3>
+<hr />
+<div id="cabecalho">
+    <a id="btn_incluir" class="btn btn-success" role="button">
+        <i class="glyphicon glyphicon-plus"></i> Incluir
+    </a>
+</div>
+<br />
+<div>
+    <table id="grid_categoria" class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var categoria in ViewBag.Categoria)
+            {
+                <tr class="teste" data-id="@categoria.Id">
+                    <td>@categoria.Id</td>
+                    <td>@categoria.Nome</td>
+                    <td>
+                        <a class="btn btn-primary btn-alterar" role="button"><i class="glyphicon glyphicon-pencil"></i>Alterar</a>
+                        <a class="btn btn-danger btn-excluir" role="button"><i class="glyphicon glyphicon-trash"></i>Excluir</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div id="modal_cadastro" class="form-horizontal invisivel" role="dialog">
+    <fieldset>
+        <div class="row">
+            <div class="form-group">
+                @Html.Label("txt_codigo", "Código", new { @class = "col-md-3 control-label" })
+                <div class="col-md-2">
+                    @Html.TextBox("txt_codigo", null, new { @class = "form-control", disabled = "true" })
+                </div>
+                <br><br>
+                @Html.Label("txt_nome", "Nome", new { @class = "col-md-3 control-label" })
+                <div class="col-md-9">
+                    @Html.TextBox("txt_nome", null, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <div class="modal-footer">
+                        <a id="btn_sair" class="btn btn-default" role="button" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Sair</a>
+                        <a id="btn_confirmar" class="btn btn-primary" role="button"><i class="glyphicon glyphicon-ok"></i> Salvar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</div>
+
+@section Scripts{
+    <script>
+        //Exibição do Form Modal
+        function abrir_form(dados) {
+            if (dados.Id > 0)
+                $('#txt_codigo').val(dados.Id);
+            else
+                $('#txt_codigo').val('');
+
+            $('#txt_nome').val(dados.Nome);
+
+            var modal_cadastro = $('#modal_cadastro');
+
+            bootbox.dialog({
+                title: '@ViewBag.Title',
+                message: modal_cadastro
+            })
+            .on('shown.bs.modal', function () {
+                modal_cadastro.show(0, function () {
+                    $('#txt_nome').focus();
+                });
+            })
+            .on('hidden.bs.modal', function () {
+                modal_cadastro.hide().appendTo('body');
+            });
+        }
+
+        //Linha na tabela
+        function criar_linha_grid(dados) {
+            var ret = '<tr data-id=' + dados.Id + '>' +
+                        '<td>' + dados.Id + '</td>' +
+                        '<td>' + dados.Nome + '</td>' +
+                        '<td>' +
+                            '<a class="btn btn-primary btn-alterar" role="button"><i class="glyphicon glyphicon-pencil"></i>Alterar</a>' +
+                            '<a class="btn btn-danger btn-excluir" role="button"><i class="glyphicon glyphicon-trash"></i>Excluir</a>' +
+                        '</td>' +
+                '</tr>';
+
+            return ret;
+        }
+
+                //Evento click do botão incluir
+        $(document).on('click', '#btn_incluir', function () {
+            abrir_form({ Id: 0, Nome: ''});
+        })
+
+        //Evento click do botão alterar
+        .on('click', '.btn-alterar', function () {
+            var btn = $(this),
+                id = btn.closest('tr').attr('data-id'),
+                url = '@Url.Action("ObterCategoria", "Cadastro")',
+                param = { 'id': id };
+
+            $.post(url, param, function (response) {
+                if (response) {
+                    abrir_form(response);
+                }
+            });
+        })
+
+        //Evento click do botão excluir
+        .on('click', '.btn-excluir', function () {
+            var btn = $(this),
+                tr = btn.closest('tr'),
+                id = tr.attr('data-id'),
+                url = '@Url.Action("ExcluirCategoria", "Cadastro")',
+                param = { 'id': id };
+
+            bootbox.confirm({
+                message: "Confirmar a exclusão da Categoria de Produto?",
+                buttons: {
+                    confirm: {
+                        label: 'Sim',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'Não',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        $.post(url, param, function (response) {
+                            if (response) {
+                                tr.remove();
+                            }
+                        });
+                    }
+                }
+            });
+        })
+
+                //Evento click do botão Salvar do form modal
+        .on('click', '#btn_confirmar', function () {
+            var btn = $(this),
+                url = '@Url.Action("SalvarCategoria", "Cadastro")',
+                param = {
+                    Id: $('#txt_codigo').val(),
+                    Nome: $('#txt_nome').val()
+                };
+
+            $.post(url, param, function (response) {
+                if (param.Id == 0) {
+                    var table = $('#grid_categoria').find('tbody'),
+                        linha = criar_linha_grid(response);
+
+                    table.append(linha);
+                }
+                else {
+                    var linha = $('#grid_categoria').find('tr[data-id=' + param.Id + ']').find('td');
+                    linha
+                        .eq(0).html(param.Id).end()
+                        .eq(1).html(param.Nome);
+                }
+
+                $('#modal_cadastro').parents('.bootbox').modal('hide');
+            })
+        })
+    </script>
+}
